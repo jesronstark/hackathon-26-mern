@@ -1,0 +1,12 @@
+{
+  "name": "hackathon-26-root",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npm start --prefix server",
+    "build": "npm install --legacy-peer-deps --prefix client && npm run build --prefix client && npm install --prefix server",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
