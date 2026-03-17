@@ -31,8 +31,8 @@ const adminRoutes = require('./routes/adminRoutes');
 app.use('/api', teamRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Serve static assets in production
-if (process.env.NODE_ENV === 'production') {
+// Serve static assets in production (Only if not handled by Vercel)
+if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
   const clientBuildPath = path.join(__dirname, '../client/dist');
   app.use(express.static(clientBuildPath));
 
@@ -40,9 +40,9 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.resolve(clientBuildPath, 'index.html'));
   });
 } else {
-  // Health check for development
+  // Health check
   app.get('/', (req, res) => {
-    res.json({ message: 'HACKATHON-26 API is running in Development 🚀' });
+    res.json({ message: 'HACKATHON-26 API is running 🚀' });
   });
 }
 
@@ -52,9 +52,14 @@ mongoose
   .connect(MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB Connected Successfully');
-    app.listen(PORT, () => console.log(`🚀 Production Server running on port ${PORT}`));
+    // Only listen if not in a serverless environment (Vercel)
+    if (!process.env.VERCEL) {
+      app.listen(PORT, () => console.log(`🚀 Production Server running on port ${PORT}`));
+    }
   })
   .catch((err) => {
     console.error('❌ MongoDB connection error:', err.message);
-    process.exit(1);
+    if (!process.env.VERCEL) process.exit(1);
   });
+
+module.exports = app;
